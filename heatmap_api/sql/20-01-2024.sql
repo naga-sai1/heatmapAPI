@@ -1,0 +1,20 @@
+CREATE TABLE `stock_data` (
+   `date` varchar(100) DEFAULT NULL,
+   `tri__Nifty_50` double DEFAULT NULL,
+   `tri__Nifty_Next_50` double DEFAULT NULL,
+   `tri__Nifty_Midcap_50` double DEFAULT NULL,
+   `tri__NIFTY_MIDCAP_100` double DEFAULT NULL,
+   `tri__NIFTY_SMLCAP_50` double DEFAULT NULL,
+   `tri__NIFTY_SMLCAP_100` double DEFAULT NULL,
+   `Nifty_100` double DEFAULT NULL,
+   `Nifty_200` double DEFAULT NULL,
+   `NIFTY_MICROCAP_250` double DEFAULT NULL,
+   `NIFTY_TOTAL_MARKET` double DEFAULT NULL,
+   `tri__NIFTY_MIDCAP_150` double DEFAULT NULL,
+   `tri__NIFTY_MIDSMALLCAP_400` double DEFAULT NULL,
+   `tri__NIFTY_500` double DEFAULT NULL,
+   `tri__NIFTY_SMALLCAP_250` double DEFAULT NULL,
+   `tri__NIFTY_SMALLCAP_50` double DEFAULT NULL,
+   `tri__NIFTY_LARGEMIDCAP_250` double DEFAULT NULL,
+   `tri__NIFTY_SMALLCAP_100` double DEFAULT NULL
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci

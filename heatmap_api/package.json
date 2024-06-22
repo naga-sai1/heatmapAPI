@@ -1,0 +1,35 @@
+{
+  "name": "heatMapAPI",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "abbrev": "^2.0.0",
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "csv-parse": "^5.5.6",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "fast-csv": "^5.0.1",
+    "fs": "^0.0.1-security",
+    "lru-cache": "^10.2.2",
+    "multer": "^1.4.5-lts.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.10.1",
+    "nodemon": "^3.1.4",
+    "path": "^0.12.7",
+    "raw-body": "^2.5.2",
+    "sequelize": "^6.37.3",
+    "xlsx": "^0.18.5",
+    "yallist": "^5.0.0"
+  }
+}
