@@ -1,11 +1,12 @@
 const fs = require('fs');
 const csv = require('fast-csv');
-const pool = require('../sql/db')
+const connectToDatabase = require('../sql/db')
 
 const formattedDateFunction = require('../constants');
 
 //broad function
-function uploadMonthAndWeek(path,fileName, callback) {
+async function uploadMonthAndWeek(path,fileName, callback) {
+    const { pool } = await connectToDatabase();
     let stream = fs.createReadStream(path);
     let csvData = [];
     let headers = []; 

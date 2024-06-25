@@ -1,16 +1,24 @@
-// const pool = require("../sql/db");
 const connectToDatabase = require("../sql/db");
+const multer = require("multer");
 const fs = require("fs");
+const path = require("path");
+
+const upload = multer({ dest: "uploads/" });
+
+const express = require("express");
+const app = express();
+
+app.post("/uploadblogdata", upload.single("image"), uploadBlogData);
 
 // function uploadBlogData(file, content) {
-//   if (!file || !content) {
+//   if (!file || !content || !title) {
 //     return Promise.reject(new Error("Image and Content are mandatory"));
 //   }
 
 //   const imageData = fs.readFileSync(file.path);
 //   console.log(imageData);
-//   const query = "INSERT INTO blog(image, content) VALUES (?, ?)";
-//   const values = [imageData, content];
+//   const query = "INSERT INTO blog(image, content, title) VALUES (?, ?, ?)";
+//   const values = [imageData, content, title];
 
 //   return new Promise((resolve, reject) => {
 //     pool.query(query, values, function (err, result) {
@@ -26,26 +34,87 @@ const fs = require("fs");
 // }
 
 //upload blog data
+// async function uploadBlogData(req, res) {
+//   try {
+//     const { BlogData } = await connectToDatabase();
+//     const reqBody = req.body;
+//     const file = req.file;
+
+//     // Check if the file and required form data are present
+//     if (!file) {
+//       return res.status(400).json({ error: 'No file uploaded.' });
+//     }
+//     if (!reqBody || !reqBody.title || !reqBody.content) {
+//       // fs.unlinkSync(file.path);
+//       return res.status(400).json({ error: 'Invalid form data' });
+//     }
+
+//     // Read the file data
+//     const imageData = fs.readFileSync(file.path);
+
+//     // Store the file data along with other form data in the database
+//     const result = await BlogData.create({
+//       image: imageData,
+//       content: reqBody.content,
+//       title: reqBody.title,
+//     });
+
+//     // Remove the temporary file after processing
+//     fs.unlinkSync(file.path);
+
+//     return res.status(200).json({ data: result });
+//   } catch (error) {
+//     console.error('Error uploading blog data:', error);
+//     if (req.file && fs.existsSync(req.file.path)) {
+//       fs.unlinkSync(req.file.path); // Remove the temporary file if there's an error
+//     }
+//     return res.status(500).json({ error: error.message });
+//   }
+// }
+
+
+//get blog data
+async function getBlogData(req, res) {
+  try {
+    const { BlogData } = await connectToDatabase();
+    const query = `SELECT * FROM blog`;
+    const data = await BlogData.sequelize.query(query, {
+      type: BlogData.sequelize.QueryTypes.SELECT,
+    });
+
+    return res.status(200).json({ data });
+  } catch (err) {
+    console.log("error getting files data", e);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
 async function uploadBlogData(req, res) {
   try {
     const { BlogData } = await connectToDatabase();
-
-    const { file, content, title } = req.body;
-    // const { content, title } = body;
-
-    if (!file || !content || !title) {
-      return res.status(400).json({ error: "Image, Content and Title are mandatory" });
-    }
+    const reqBody = req.body;
+    const file = req.file;
 
     const imageData = fs.readFileSync(file.path);
-    console.log(imageData);
-    const result = await BlogData.create({ image: imageData, content, title });
 
-    return res.status(200).json({ data: result });
+    // const query = `SELECT * FROM users WHERE email = :email`;
+    // const data = await UserData.sequelize.query(query, {
+    //   type: UserData.sequelize.QueryTypes.SELECT,
+    //   replacements: { email: reqBody.email },
+    // });
+
+    if (reqBody && reqBody.title && reqBody.content) {
+      const result = await BlogData.create({ image: imageData, content: reqBody.content, title: reqBody.title });
+      return res.status(200).json({ data: result });
+    }
+    return res.status(200).json({ data: reqBody });
   } catch (error) {
-    console.error("Error uploading blog data:", error);
+    console.error("Error fetching heat map data:", error);
     return res.status(500).json({ error: error.message });
   }
 }
 
-module.exports = { uploadBlogData };
+module.exports = {
+  uploadBlogData,
+  getBlogData,
+};

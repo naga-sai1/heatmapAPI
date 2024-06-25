@@ -4,7 +4,7 @@
 // const path = require('path');
 // const { error } = require('console');
 // const cors = require('cors');
-// const pool = require('../sql/db');
+// const pool = require('./db');
 // const app = express();
 // const comparisionController = require('./controllers/comparisionController');
 // const stock_heat_controller = require('./controllers/stock_heat_controller');

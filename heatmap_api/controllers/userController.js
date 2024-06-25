@@ -23,6 +23,41 @@ async function googleLogin(req, res) {
   }
 }
 
+//get unsubscribe user data
+async function getUnsubscribeUserData(req, res) {
+  try {
+    const { UserData } = await connectToDatabase();
+    const query = `SELECT * FROM users WHERE is_subscribed = false`;
+    const data = await UserData.sequelize.query(query, {
+      type: UserData.sequelize.QueryTypes.SELECT,
+    });
+
+    return res.status(200).json({ data });
+  } catch (err) {
+    console.log("error getting files data", e);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+// Get all subscribers data
+async function getSubscribersData(req, res) {
+  try {
+    const { UserData } = await connectToDatabase();
+    const query = `SELECT * FROM users WHERE is_subscribed = true`;
+    const data = await UserData.sequelize.query(query, {
+      type: UserData.sequelize.QueryTypes.SELECT,
+    });
+
+    return res.status(200).json({ data });
+  }
+  catch (error) {
+    console.error('Error getting subscriber data', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
 module.exports = {
   googleLogin,
+  getUnsubscribeUserData,
+  getSubscribersData,
 };
