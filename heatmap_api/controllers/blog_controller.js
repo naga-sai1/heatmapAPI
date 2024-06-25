@@ -8,7 +8,7 @@ const upload = multer({ dest: "uploads/" });
 const express = require("express");
 const app = express();
 
-app.post("/uploadblogdata", upload.single("image"), uploadBlogData);
+// app.post("/uploadblogdata", upload.single("image"), uploadBlogData);
 
 // function uploadBlogData(file, content) {
 //   if (!file || !content || !title) {
@@ -94,20 +94,25 @@ async function uploadBlogData(req, res) {
     const { BlogData } = await connectToDatabase();
     const reqBody = req.body;
     const file = req.file;
+  
+    // Check if the file and required form data are present
+    if (!file) {
+      return res.status(400).json({ error: "No file uploaded." });
+    }
+    if (!reqBody || !reqBody.title || !reqBody.content) {
+      return res.status(400).json({ error: "Invalid form data" });
+    }
 
-    const imageData = fs.readFileSync(file.path);
-
-    // const query = `SELECT * FROM users WHERE email = :email`;
-    // const data = await UserData.sequelize.query(query, {
-    //   type: UserData.sequelize.QueryTypes.SELECT,
-    //   replacements: { email: reqBody.email },
-    // });
-
-    if (reqBody && reqBody.title && reqBody.content) {
-      const result = await BlogData.create({ image: imageData, content: reqBody.content, title: reqBody.title });
+    if (reqBody.title && reqBody.content) {
+      const result = await BlogData.create({
+        image: file.path,
+        content: reqBody.content,
+        title: reqBody.title,
+      });
       return res.status(200).json({ data: result });
     }
-    return res.status(200).json({ data: reqBody });
+
+    return res.status(200).json({ data: data[0] });
   } catch (error) {
     console.error("Error fetching heat map data:", error);
     return res.status(500).json({ error: error.message });
