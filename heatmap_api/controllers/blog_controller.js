@@ -72,6 +72,9 @@ const app = express();
 //   }
 // }
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 
 //get blog data
 async function getBlogData(req, res) {
@@ -93,8 +96,10 @@ async function uploadBlogData(req, res) {
   try {
     const { BlogData } = await connectToDatabase();
     const reqBody = req.body;
-    const file = req.file;
-  
+    const file = reqBody.file;
+    
+   console.log(reqBody);
+
     // Check if the file and required form data are present
     if (!file) {
       return res.status(400).json({ error: "No file uploaded." });
@@ -103,18 +108,26 @@ async function uploadBlogData(req, res) {
       return res.status(400).json({ error: "Invalid form data" });
     }
 
+    // Read the file data
+    const imageData = fs.readFileSync(file.path);
+
     if (reqBody.title && reqBody.content) {
       const result = await BlogData.create({
-        image: file.path,
+        image: imageData,
         content: reqBody.content,
         title: reqBody.title,
       });
+
+      // Remove the temporary file after processing
+      fs.unlinkSync(file.path);
+
       return res.status(200).json({ data: result });
     }
-
-    return res.status(200).json({ data: data[0] });
   } catch (error) {
     console.error("Error fetching heat map data:", error);
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path); // Remove the temporary file if there's an error
+    }
     return res.status(500).json({ error: error.message });
   }
 }
