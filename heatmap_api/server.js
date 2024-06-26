@@ -1,11 +1,43 @@
-const express = require("express");
+const express = require("express"); 
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
-const { error } = require("console");
 const cors = require("cors");
+const { error } = require("console");
+
 const pool = require("./sql/db");
+
 const app = express();
+app.use(express.json());
+app.use(cors());
+app.use(
+  cors({
+    origin: "https://heatmapapi.onrender.com",
+  })
+);
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+
+
+app.use(express.urlencoded({ extended: true }));
+
+const corsOptions = { credentials: true, origin: "*" };
+
+app.use(express.static(path.join(__dirname, "public")));
+
+// Enable CORS
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "POST, GET, PUT");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
+
 const comparisionController = require("./controllers/comparisionController");
 const stock_heat_controller = require("./controllers/stock_heat_controller");
 const month_week_controller = require("./controllers/month_week_controller");
@@ -21,7 +53,7 @@ const couponCodeRoutes = require("./routes/couponCodeRoutes");
 const PORT = process.env.PORT || 8888;
 
 // multer config
-let storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: (req, file, callback) => {
     callback(null, "./uploads/");
   },
@@ -33,37 +65,13 @@ let storage = multer.diskStorage({
   },
 });
 
-app.use(
-  cors({
-    origin: "https://heatmapapi.onrender.com",
-  })
-);
 
-let upload = multer({ storage: storage });
+
+const upload = multer({ storage: storage });
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-const corsOptions = { credentials: true, origin: "*" };
-app.use(cors(corsOptions));
-app.use(express.static(path.join(__dirname, "public")));
-
-// Enable CORS
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "POST, GET, PUT");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
 
 app.get("/", (req, res) => {
   res.send("Hello this is the stock API.");
@@ -81,25 +89,25 @@ app.get("*", function (req, res) {
 });
 
 // Blog POST request
-// app.post('/upload-blog', upload.single('file'), (req, res) => {
-//     if (!req.file) {
-//         return res.status(400).send('No file uploaded.');
-//     }
-//     console.log('File uploaded', req.file);
-//     const content = req.body.content;
-//     const title = req.body.title;
-//     console.log(content);
-//     console.log(title);
-//     console.log(req.file.fieldname);
-//     blog_controller.uploadBlogData(req.file, content, title).then(result => {
-//         console.log('Blog data uploaded successfully:', result);
-//         res.status(200).send('Blog data uploaded successfully.');
-//     })
-//         .catch(error => {
-//             console.error('Error uploading blog data:', error);
-//             res.status(500).send('Error uploading blog data.');
-//         });
-// });
+app.post('/upload-blog', upload.single('file'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).send('No file uploaded.');
+    }
+    console.log('File uploaded', req.file);
+    const content = req.body.content;
+    const title = req.body.title;
+    console.log(content);
+    console.log(title);
+    console.log(req.file.fieldname);
+    blog_controller.uploadBlogData(req.file, content, title).then(result => {
+        console.log('Blog data uploaded successfully:', result);
+        res.status(200).send('Blog data uploaded successfully.');
+    })
+        .catch(error => {
+            console.error('Error uploading blog data:', error);
+            res.status(500).send('Error uploading blog data.');
+        });
+});
 
 // Coupon code POST request
 app.post("/handle-couponcode", (req, res) => {
