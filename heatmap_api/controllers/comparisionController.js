@@ -42,7 +42,8 @@ async function uploadBroad(path, fileName, callback) {
                   csvData.forEach((row) => {
                     let valueToUpdate = row[index + 1];
                     const commonColumnName = row[0];
-                    let date = Date.now();
+                    let date = Date.now().microSecondsSinceEpoch;
+                    console.log("date", date);
                     let formattedDate =
                       formattedDateFunction.formatTimestamp(date);
                     let name = "Broad";
@@ -50,6 +51,9 @@ async function uploadBroad(path, fileName, callback) {
 
                     let fileQuery =
                       "INSERT INTO file_data (category, dates, file_name) VALUES (?)";
+                    let checkFileQuery = "SELECT * FROM file_data WHERE file_name = ?";
+
+
 
                     // Fetch the current value of the column from the database
                     connection.query(
@@ -84,26 +88,45 @@ async function uploadBroad(path, fileName, callback) {
                               } else {
                                 console.log(" updated successfully");
 
-                                connection.query(
-                                  fileQuery,
-                                  [fileData],
-                                  (fileInsertError, fileInsertResult) => {
-                                    if (fileInsertError) {
-                                      console.error(
-                                        "Error uploading file data",
-                                        fileInsertError
-                                      );
-                                      connection.release();
-                                      return callback(fileInsertError);
-                                    } else {
-                                      console.log(
-                                        "File data uploaded successfully"
-                                      );
+                                // connection.query(
+                                  // fileQuery,
+                                  // [fileData],
+                                  // (fileInsertError, fileInsertResult) => {
+                                  //   if (fileInsertError) {
+                                  //     console.error(
+                                  //       "Error uploading file data",
+                                  //       fileInsertError
+                                  //     );
+                                  //     connection.release();
+                                  //     return callback(fileInsertError);
+                                  //   } else {
+                                  //     console.log(
+                                  //       "File data uploaded successfully"
+                                  //     );
+                                  //     connection.release();
+                                  //     return callback(null);
+                                  //   }
+                                  // }
+
+                                // );
+
+                                connection.query(checkFileQuery, [fileName], (checkError, checkResult) => {
+                                  if (checkError) {
+                                    console.error("Error checking file data", checkError);
+                                    connection.release();
+                                    return callback(checkError);
+                                  } else if (checkResult.length > 0) {
+                                    console.log("File data already uploaded");
+                                    connection.release();
+                                    return callback(null);
+                                  } else {
+                                    connection.query(fileQuery, [fileData], (fileInsertError, fileInsertResult) => {
+                                      console.log("File data uploaded successfully");
                                       connection.release();
                                       return callback(null);
-                                    }
+                                    })
                                   }
-                                );
+                                })
                               }
                             }
                           );
@@ -493,6 +516,9 @@ async function uploadSector(path, fileName, callback) {
     });
   stream.pipe(fileStream);
 }
+
+
+
 
 
 
