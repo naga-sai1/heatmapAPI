@@ -146,4 +146,22 @@ async function uploadMonthAndWeek(path, fileName, callback) {
   stream.pipe(fileStream);
 }
 
-module.exports = { uploadMonthAndWeek };
+//get all data from month_and_week table
+async function getMonthAndWeekData(req, res) {
+  try {
+    const { MonthAndWeekData } = await connectToDatabase();
+    const query = "SELECT * FROM month_and_week";
+    const data = await MonthAndWeekData.sequelize.query(query, {
+      type: MonthAndWeekData.sequelize.QueryTypes.SELECT,
+    });
+    console.log("data", data);
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+module.exports = {
+  uploadMonthAndWeek,
+  getMonthAndWeekData,
+};

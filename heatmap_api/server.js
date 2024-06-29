@@ -1,4 +1,4 @@
-const express = require("express"); 
+const express = require("express");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
@@ -41,12 +41,15 @@ const stock_heat_controller = require("./controllers/stock_heat_controller");
 const month_week_controller = require("./controllers/month_week_controller");
 const blog_controller = require("./controllers/blog_controller");
 const coupon_controller = require("./controllers/coupon_code_controller");
+const plans_controller = require("./controllers/plans_controller");
 
 const stockRoutes = require("./routes/stockRoutes");
 const heatMaproutes = require("./routes/heatMapRoutes");
 const usersRoutes = require("./routes/usersRoutes");
 const blogRoutes = require("./routes/blogRoutes");
 const couponCodeRoutes = require("./routes/couponCodeRoutes");
+const plansRoutes = require("./routes/plansRoutes");
+const monthAndWeekRoutes = require("./routes/monthAndWeekRoutes");
 
 const PORT = process.env.PORT || 8888;
 
@@ -63,13 +66,10 @@ const storage = multer.diskStorage({
   },
 });
 
-
-
 const upload = multer({ storage: storage });
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-
 
 app.get("/", (req, res) => {
   res.send("Hello this is the stock API.");
@@ -81,31 +81,52 @@ app.use(heatMaproutes);
 app.use(usersRoutes);
 app.use(blogRoutes);
 app.use(couponCodeRoutes);
+app.use(plansRoutes);
+app.use(monthAndWeekRoutes);
 
 app.get("*", function (req, res) {
   res.status(404).render("errors/404");
 });
 
 // Blog POST request
-app.post('/upload-blog', upload.single('file'), (req, res) => {
-    if (!req.file) {
-        return res.status(400).send('No file uploaded.');
-    }
-    console.log('File uploaded', req.file);
-    const content = req.body.content;
-    const title = req.body.title;
-    console.log(content);
-    console.log(title);
-    console.log(req.file.fieldname);
-    blog_controller.uploadBlogData(req.file, content, title).then(result => {
-        console.log('Blog data uploaded successfully:', result);
-        res.status(200).send('Blog data uploaded successfully.');
+app.post("/upload-blog", upload.single("file"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
+  console.log("File uploaded", req.file);
+  const content = req.body.content;
+  const title = req.body.title;
+  console.log(content);
+  console.log(title);
+  console.log(req.file.fieldname);
+  blog_controller
+    .uploadBlogData(req.file, content, title)
+    .then((result) => {
+      console.log("Blog data uploaded successfully:", result);
+      res.status(200).send("Blog data uploaded successfully.");
     })
-        .catch(error => {
-            console.error('Error uploading blog data:', error);
-            res.status(500).send('Error uploading blog data.');
-        });
+    .catch((error) => {
+      console.error("Error uploading blog data:", error);
+      res.status(500).send("Error uploading blog data.");
+    });
 });
+
+// Edit blog data
+// app.post("/editBlog/:id", upload.single("file"), (req, res) => {
+//   console.log("hello called edit blog");
+//   const content = req.body.content;
+//   const title = req.body.title;
+//   blog_controller
+//     .editBlogData(req.file, content, title)
+//     .then((result) => {
+//       console.log("Blog edited successfully:", result);
+//       res.status(200).send("Blog Edited successfully.");
+//     })
+//     .catch((error) => {
+//       console.error("Error edting blog:", error);
+//       res.status(500).send("Error edting blog data.");
+//     });
+// });
 
 // Coupon code POST request
 app.post("/handle-couponcode", (req, res) => {
@@ -113,21 +134,17 @@ app.post("/handle-couponcode", (req, res) => {
   coupon_controller
     .toggleCouponActivation(status)
     .then((results) => {
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: `Coupon code activation status updated successfully. ${status}`,
-        });
+      res.status(200).json({
+        success: true,
+        message: `Coupon code activation status updated successfully. ${status}`,
+      });
     })
     .catch((error) => {
       console.error("Error handling coupon code:", error);
-      res
-        .status(500)
-        .json({
-          success: false,
-          message: "Failed to update coupon code activation status.",
-        });
+      res.status(500).json({
+        success: false,
+        message: "Failed to update coupon code activation status.",
+      });
     });
 });
 

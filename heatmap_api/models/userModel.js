@@ -4,6 +4,11 @@ module.exports = (sequelize) => {
   return sequelize.define(
     "users",
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       first_name: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -17,7 +22,16 @@ module.exports = (sequelize) => {
         allowNull: false,
       },
       is_subscribed: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.BOOLEAN,
+      },
+      subscribe_expired_on: {
+        type: DataTypes.DATE,
+      },
+      email_verified: {
+        type: DataTypes.BOOLEAN,
+      },
+      subscribed_on: {
+        type: DataTypes.DATE,
       },
     },
     {

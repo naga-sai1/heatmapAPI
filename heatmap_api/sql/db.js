@@ -10,6 +10,7 @@ const UserModel = require('../models/userModel');
 const BlogModel = require('../models/blogModel');
 const CouponCodeModel = require('../models/couponCodeModel');
 const MonthAndWeekModel = require('../models/monthAndWeekModel');
+const PlansModel = require('../models/plansModel');
 
 // MySQL connection pool setup
 const pool = mysql.createPool({
@@ -44,6 +45,7 @@ const UserData = UserModel(sequelize);
 const BlogData = BlogModel(sequelize);
 const CouponCodeData = CouponCodeModel(sequelize);
 const MonthAndWeekData = MonthAndWeekModel(sequelize);
+const PlansData = PlansModel(sequelize);
 
 // Object to track connection status
 const connection = {};
@@ -59,6 +61,7 @@ const Models = {
   BlogData,
   CouponCodeData,
   MonthAndWeekData,
+  PlansData,
 };
 
 module.exports = async () => {

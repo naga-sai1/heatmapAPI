@@ -72,7 +72,7 @@ async function getCouponCodeStatus(req, res) {
   try {
     const { CouponCodeData } = await connectToDatabase();
 
-    const query = `SELECT status FROM coupon_code`;
+    const query = `SELECT * FROM coupon_code`;
     const data = await CouponCodeData.sequelize.query(query, {
       type: CouponCodeData.sequelize.QueryTypes.SELECT,
     });
