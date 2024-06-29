@@ -44,7 +44,7 @@ async function getBlogData(req, res) {
 
     return res.status(200).json({ data });
   } catch (err) {
-    console.log("error getting files data", e);
+    console.log("error getting files data", err);
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }
