@@ -52,36 +52,20 @@ async function getBlogData(req, res) {
 //edit blog data
 async function editBlogData(req, res) {
   try {
-    const file = req.file;
     const { BlogData } = await connectToDatabase();
-    const id = req.params.id;
-    console.log('id', id);
-    const content = req.body.content;
-    const title = req.body.title;
-
-    const checkResult = `SELECT * FROM blog WHERE slno = ${id}`
-
-    const data = await BlogData.sequelize.query(checkResult, {
-      type: BlogData.sequelize.QueryTypes.SELECT,
-    });
-
-    if (data.length === 0) {
-      return res.status(404).json({ error: "Blog not found" });
+    const data = await BlogData.findByPk(req.params.id);
+    if (!data) return res.status(404).json({ error: "Blog not found" });
+    if (req.file) {
+      const imageData = fs.readFileSync(req.file.path);
+      data.image = imageData;
     }
-    else{
-
-    const imageData = fs.readFileSync(file.path);
-   
-    const query = `UPDATE blog SET title = ?, content = ?, image = ? WHERE slno = ${id}`;
-    const values = [title, content, imageData];
-    const result = await BlogData.sequelize.query(query, {
-      replacements: values,
-    });
-      return res.status(200).json({ data: "Blog edited successfully" });
-    }
-  } catch (err) {
-    console.log("error editing blog data", err);
-    return res.status(500).json({ error: "Internal Server Error" });
+    if (req.body.content) data.content = req.body.content;
+    if (req.body.title) data.title = req.body.title;
+    await data.save();
+    return res.status(200).json({ message: data });
+  } catch (error) {
+    console.error("Error editing blog data:", error);
+    return res.status(500).json({ error: error.message });
   }
 }
 

@@ -66,7 +66,11 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ 
+  storage: storage,
+  //10 MB file size limit
+  limits: {fileSize: 1024 * 1024 * 10} 
+});
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));

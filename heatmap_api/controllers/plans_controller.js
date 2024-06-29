@@ -36,24 +36,26 @@ async function getPlans(req, res) {
     }
 }
 
-//edit plans in the database
-// async function editPlan(req, res) {
-//     const { PlansData } = await connectToDatabase();
-//     const {id} = req.params
-//     const {months, amount} = req.body
-//     const query = `SELECT * FROM plans WHERE sl_no = ${id}`
-//     const checkPlan = await PlansData.sequelize.query(query, {
-//         type: PlansData.sequelize.QueryTypes.SELECT,
-//     });
+//edit plans data
+async function editPlan(req, res) {
+  try {
+    const { PlansData } = await connectToDatabase();
+    // Update the access_permissions using the Sequelize model
+    const data = await PlansData.findByPk(req.params.id);
+    if (!data) return res.status(404).json({ error: "Plan not found" });
+     // Update access_permissions properties
+    if (req.body.months) data.months = req.body.months;
+    if (req.body.amount) data.amount = req.body.amount;
+    await data.save();
+    return res.status(200).json({ message: data });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
+  }
+}
 
-//     if (checkPlan.length === 0) {
-//         return res.status(404).json({error: "Plan not found"});
-//     }else {
-//         const query = 
-//     }
-// }
 
 module.exports = {
   createPlan,
   getPlans,
+  editPlan,
 };

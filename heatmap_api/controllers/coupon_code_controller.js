@@ -27,45 +27,29 @@ const connectToDatabase = require("../sql/db");
 async function toggleCouponActivation(req, res) {
   try {
     const { CouponCodeData } = await connectToDatabase();
-    const reqBody = req.body;
-    const status = reqBody.status;
-
-    const query = `UPDATE coupon_code SET status = :status WHERE coupon_code = 'ABC10EF5'`;
-    const data = await CouponCodeData.sequelize.query(query, {
-      type: CouponCodeData.sequelize.QueryTypes.UPDATE,
-      replacements: { status: status },
-    });
-
-    return res.status(200).json({ data });
+    const data = await CouponCodeData.findByPk(req.params.id);
+    if (!data) return res.status(404).json({ error: "Coupon code not found" });
+    if (req.body.status) data.status = req.body.status;
+    if (req.body.discount) data.discount = req.body.discount;
+    await data.save();
+    return res.status(200).json({ message: data });
   } catch (error) {
     console.error("Error toggling coupon activation:", error);
     return res.status(500).json({ error: error.message });
   }
 }
 
-// Get coupon code status
-// async function getCouponCodeStatus(req, res) {
-//   try {
-//     getConnection((err, connection) => {
-//       if (err) {
-//         console.log("Error getting database connection:", err);
-//         return res.status(500).json({ error: "Internal Server Error" });
-//       } else {
-//         const query = "SELECT status FROM coupon_code";
-//         connection.query(query, (error, results) => {
-//           if (error) {
-//             console.log("Error executing the query", error);
-//             return res.status(500).json({ error: "Internal Server Error" });
-//           }
-//           res.status(200).json({ results });
-//         });
-//       }
-//     });
-//   } catch (error) {
-//     console.log("Error getting files data", error);
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// }
+// upload coupon code
+async function uploadCouponCode(req, res) {
+  try {
+    const { CouponCodeData } = await connectToDatabase();
+    const data = await CouponCodeData.create(req.body);
+    return res.status(200).json({ message: data });
+  } catch (error) {
+    console.error("Error uploading coupon code:", error);
+    return res.status(500).json({ error: error.message });
+  }
+}
 
 // getCouponCodeStatus function
 async function getCouponCodeStatus(req, res) {
@@ -113,4 +97,5 @@ module.exports = {
   toggleCouponActivation,
   getCouponCodeStatus,
   getUploadedFilesData,
+  uploadCouponCode,
 };

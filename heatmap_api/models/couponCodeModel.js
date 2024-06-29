@@ -12,6 +12,10 @@ module.exports = (sequelize) => {
                 type: DataTypes.TINYINT,
                 allowNull: true,
             },
+            discount: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            },
         },
         {
             tableName: "coupon_code",
